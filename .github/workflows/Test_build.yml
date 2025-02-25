@@ -1,4 +1,4 @@
-name: Build
+name: Build2
 
 on:
   workflow_dispatch:
@@ -86,6 +86,13 @@ jobs:
         $zipName = "${{ steps.get_version.outputs.filename }}.7z"
         7z a ${{ github.workspace }}\$zipName ${{ env.ARTIFACT_DIR }}\*.*
         
+    - name: Check for missing headers
+      run: |
+        find . -name '*.h' -o -name '*.hpp' | while read file; do
+          grep -rnw './src' -e $(basename $file) || echo "Missing header: $file"
+        done
+      continue-on-error: true
+      
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.get_version.outputs.filename }}
